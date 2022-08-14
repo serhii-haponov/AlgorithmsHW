@@ -8,18 +8,25 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+    
+    // MARK: - Execution
     override func viewDidLoad() {
         super.viewDidLoad()
-        let coordinates = CoordinatesDataSourse.genarage(amount: 10)
-        print(coordinates)
-        let bigestPrimeter = bigestPrimeter(coordinates: coordinates)
-        print(perimeterDescription(perimeter: bigestPrimeter))
+//        startCalculateBigestPrimeter()
+        startCalculateNumberVariety()
     }
-
 }
 
 // MARK: - Task 1
+//1) Програма отримує на вхід набір точок на площині. Напочатку задано кількість точок n (2 < n < 101), далі йде послідовність з n рядків, кожен з яких містить 2 числа - координати точки. Всі координати - це цілі числа не більше 1000. Серед заданих точок знайдіть 3, які утворюють трикутник з максимальним периметром та виведіть його з точністю в 15 значущих цифр.
+//Вхід:
+//4
+//0 0
+//0 1
+//1 0
+//1 1
+//Вихід
+//3.41421356237309
 fileprivate extension ViewController {
     
     struct Coordinate {
@@ -31,10 +38,17 @@ fileprivate extension ViewController {
         static func genarage(amount: Int) -> [Coordinate] {
             var coordinages: [Coordinate] = []
             for _ in 0...amount {
-                let coordinate = Coordinate(x: Int.random(in: 0..<1000), y: Int.random(in: 0..<1000))
+                let coordinate = Coordinate(x: Int.random(in: 0...1000), y: Int.random(in: 0...1000))
                 coordinages.append(coordinate)
             }
             return coordinages
+        }
+        
+        static func defaultValue() -> [Coordinate] {
+            return [Coordinate(x: 0, y: 1),
+                    Coordinate(x: 1, y: 1),
+                    Coordinate(x: 1, y: 0),
+                    Coordinate(x: 0, y: 0)]
         }
     }
     
@@ -47,7 +61,7 @@ fileprivate extension ViewController {
      }
      
     func perimeterDescription(perimeter: Double) -> String {
-         return String(format: "%.13f", perimeter)
+         return String(format: "%.14f", perimeter)
      }
      
     func calculateDistance(point1: Coordinate, point2: Coordinate) -> Double {
@@ -91,5 +105,109 @@ fileprivate extension ViewController {
         }
         return bigestPerimeter
     }
+    
+    func startCalculateBigestPrimeter() {
+//        let coordinates = CoordinatesDataSourse.genarage(amount: 10)
+        let coordinates = CoordinatesDataSourse.defaultValue()
 
+        let bigestPrimeter = bigestPrimeter(coordinates: coordinates)
+        print(perimeterDescription(perimeter: bigestPrimeter))
+    }
+}
+
+// MARK: - Task 2
+//2) Javelin важить Х кг, NLAW - Y кг, Bayraktar - Z кг.
+//Напишіть програму яка визначить скільки різних варіантів “подарунків” для русні вагою рівно W кг може зробити NATO. На вхід подається чотири цілих числа X, Y, Z та W (1 ≤ X, Y, Z ≤ 100, 1 ≤ W ≤ 1000))
+//Вхід
+//10 25 15 40
+//Вихід містить одне ціле число – кількість варіантів подарунків
+//3
+fileprivate extension ViewController {
+    struct WeaponDelivery {
+        let Javelin: Int
+        let NLAW: Int
+        let Bayraktar: Int
+        let totalWeight: Int
+    }
+    
+    struct DeliveryDataBase {
+        static func genarate() -> WeaponDelivery {
+            let Javelin = Int.random(in: 1...100)
+            let NLAW = Int.random(in: 1...100)
+            let Bayraktar = Int.random(in: 1...100)
+            let totalWeight = Int.random(in: 1...1000)
+            
+            return WeaponDelivery(Javelin: Javelin,
+                                  NLAW: NLAW,
+                                  Bayraktar: Bayraktar,
+                                  totalWeight: totalWeight)
+        }
+        
+        static func defaultValue() -> WeaponDelivery {
+            return WeaponDelivery(Javelin: 10,
+                                  NLAW: 15,
+                                  Bayraktar: 25 ,
+                                  totalWeight: 40)
+        }
+    }
+    
+    func calculateWeaponVariety(weaponDelivery: WeaponDelivery) -> Int { // W == 1000 => 10^6 operations
+        let totalWeight = weaponDelivery.totalWeight
+        let Bayraktar = weaponDelivery.Bayraktar
+        let NLAW = weaponDelivery.NLAW
+        let Javelin = weaponDelivery.Javelin
+        
+        var varietyNum = 0
+        
+        var i = 0
+        while i <= totalWeight {
+            if i == totalWeight {
+                varietyNum += 1
+                break
+            }
+            var j = 0
+            let iRemainWeight = totalWeight - i
+            while j <= iRemainWeight {
+                if j == iRemainWeight {
+                    varietyNum += 1
+                    break
+                }
+
+                let jRemainWeight = iRemainWeight - j
+                if jRemainWeight % Javelin == 0 {
+                    varietyNum += 1
+                }
+                j += NLAW
+            }
+            i += Bayraktar
+        }
+        return varietyNum
+    }
+    
+    func startCalculateNumberVariety() {
+        let db = DeliveryDataBase.genarate()
+        let defaultDB = DeliveryDataBase.defaultValue()
+        let veriery = calculateWeaponVariety(weaponDelivery: db)
+        print(veriery)
+    }
+}
+
+// MARK: - Task 3
+//3) Пришвидшіть код який оброблю картинку з рандомними значеннями пікселів
+//const int N = 4096;
+//byte [,] image = new byte[N, N];
+//public bool isDark() {
+//    count = 0
+//    for (int j = 0; j < N; ++j) {
+//        for (int i = 0; i < N; ++i) {
+//             if (image[i, j] >= 128) {
+//                count += 1;
+//            }
+//        }
+//   }
+//
+//   return count < N * N / 2;
+//}
+fileprivate extension ViewController {
+    
 }
