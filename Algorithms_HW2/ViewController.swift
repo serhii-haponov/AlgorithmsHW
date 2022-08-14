@@ -13,7 +13,17 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 //        startCalculateBigestPrimeter()
-        startCalculateNumberVariety()
+//        startCalculateNumberVariety()
+        
+        startMesureImageHandlerFunc()
+    }
+    
+    // MARK: - Tools
+    func measureTime(for closure: () -> Void) {
+        let start = CFAbsoluteTimeGetCurrent()
+        closure()
+        let diff = CFAbsoluteTimeGetCurrent() - start
+        print("Took \(diff) seconds")
     }
 }
 
@@ -130,7 +140,7 @@ fileprivate extension ViewController {
         let totalWeight: Int
     }
     
-    struct DeliveryDataBase {
+    struct DeliveryDataSource {
         static func genarate() -> WeaponDelivery {
             let Javelin = Int.random(in: 1...100)
             let NLAW = Int.random(in: 1...100)
@@ -185,9 +195,9 @@ fileprivate extension ViewController {
     }
     
     func startCalculateNumberVariety() {
-        let db = DeliveryDataBase.genarate()
-        let defaultDB = DeliveryDataBase.defaultValue()
-        let veriery = calculateWeaponVariety(weaponDelivery: db)
+        let ds = DeliveryDataSource.genarate()
+        let defaultDB = DeliveryDataSource.defaultValue()
+        let veriery = calculateWeaponVariety(weaponDelivery: ds)
         print(veriery)
     }
 }
@@ -209,5 +219,81 @@ fileprivate extension ViewController {
 //   return count < N * N / 2;
 //}
 fileprivate extension ViewController {
+    enum Constants {
+        static let N = 4096
+    }
     
+    struct ImageDataSource {
+        let N = Constants.N
+            
+        static func generate() -> [[Int]] {
+            let N = 4096
+            var image: [[Int]] = Array(repeating: Array(repeating: 0, count: N), count: N)
+            
+            for j in 0..<N {
+                for i in 0..<N {
+                    image[j][i] = Int.random(in: 0...255)
+                }
+            }
+            return image
+        }
+    }
+    
+    func isDark(image: [[Int]]) -> Bool {
+        let N = Constants.N
+        var count = 0
+        
+        var j = 0
+        while j < N {
+            var i = 0
+            while i < N {
+                if image[i][j] >= 128 {
+                    count += 1
+                }
+                i += 1
+            }
+            j += 1
+        }
+        return count < N * N / 2
+    }
+    
+    func isDarkOptimized(image: [[Int]]) -> Bool {
+        let N = Constants.N
+        var count = 0
+        
+        var j = 0
+        while j < N {
+            var i = 0
+            while i < N {
+                if image[j][i] >= 128 {
+                    count += 1
+                }
+                i += 1
+            }
+            j += 1
+        }
+        return count < N * N / 2
+    }
+
+    
+    func startMesureImageHandlerFunc() {
+        let image = ImageDataSource.generate()
+            print("Start:")
+            measureTime {
+                print("isDark = \(isDark(image: image))")
+            }
+        
+            measureTime {
+                print("isDarkOptimized = \(isDarkOptimized(image: image))")
+            }
+//        Before optimization:
+//          Initial:
+//          isDark = false
+//          Took 0.8521819114685059 seconds
+        
+//        After optimization: image[i][j] -> image[j][i] - reduce twice cause the cache memory rules
+//          Start:
+//          isDark = true
+//          Took 0.45027804374694824 seconds
+    }
 }
