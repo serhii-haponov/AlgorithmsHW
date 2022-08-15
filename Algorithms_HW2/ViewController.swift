@@ -14,8 +14,8 @@ class ViewController: UIViewController {
         super.viewDidLoad()
 //        startCalculateBigestPrimeter()
 //        startCalculateNumberVariety()
-//        startMesureImageHandlerFunc()
-        startMesureCalculateSinX()
+        startMesureImageHandlerFunc()
+//        startMesureCalculateSinX()
     }
     
     // MARK: - Tools
@@ -261,16 +261,11 @@ fileprivate extension ViewController {
         let N = ImageConstants.N
         var count = 0
         
-        var j = 0
-        while j < N {
-            var i = 0
-            while i < N {
-                if image[j][i] >= 128 {
-                    count += 1
-                }
-                i += 1
+        for row in 0..<N {
+            for colm in 0..<N {
+                let num = image[row][colm] >> 7
+                count += num
             }
-            j += 1
         }
         return count < N * N / 2
     }
