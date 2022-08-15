@@ -14,8 +14,8 @@ class ViewController: UIViewController {
         super.viewDidLoad()
 //        startCalculateBigestPrimeter()
 //        startCalculateNumberVariety()
-        
-        startMesureImageHandlerFunc()
+//        startMesureImageHandlerFunc()
+        startMesureCalculateSinX()
     }
     
     // MARK: - Tools
@@ -219,12 +219,12 @@ fileprivate extension ViewController {
 //   return count < N * N / 2;
 //}
 fileprivate extension ViewController {
-    enum Constants {
+    enum ImageConstants {
         static let N = 4096
     }
     
     struct ImageDataSource {
-        let N = Constants.N
+        let N = ImageConstants.N
             
         static func generate() -> [[Int]] {
             let N = 4096
@@ -240,7 +240,7 @@ fileprivate extension ViewController {
     }
     
     func isDark(image: [[Int]]) -> Bool {
-        let N = Constants.N
+        let N = ImageConstants.N
         var count = 0
         
         var j = 0
@@ -258,7 +258,7 @@ fileprivate extension ViewController {
     }
     
     func isDarkOptimized(image: [[Int]]) -> Bool {
-        let N = Constants.N
+        let N = ImageConstants.N
         var count = 0
         
         var j = 0
@@ -319,5 +319,78 @@ fileprivate extension ViewController {
 //     }
 //}
 fileprivate extension ViewController {
+    enum RadianConstants {
+       static let terms = 15
+       static let N = 10000
+    }
     
+    
+    struct RadianDataSource {
+        static func genarage() -> [Float] {
+            var radians: [Float] = []
+            
+            for _ in 0..<RadianConstants.N {
+                radians.append(Float.random(in: 0..<1))
+            }
+            return radians
+        }
+    }
+    
+    func sinx(terms: Int, x: [Float]) -> [Float] {
+        let N = RadianConstants.N
+        var result: [Float] = []
+        for i in 0..<N {
+            var value: Float = x[i]
+            var numer: Float = x[i] * x[i] * x[i]
+            var denom: Float = 6 //3!
+            var sign: Float = -1
+            
+            for j in 1...terms {
+                value += sign * numer / denom
+                numer *= x[i] * x[i]
+                sign *= -1
+                denom *= Float((2 * j + 2) * (2 * j + 3))
+            }
+            result.append(value)
+        }
+        return result
+    }
+
+    
+    func sinxOptimized(terms: Int, x: [Float]) -> [Float] {
+        let N = RadianConstants.N
+        var result: [Float] = []
+        var denomValues: [Float] = [6]
+        for i in 0..<N {
+            var value: Float = x[i]
+            var numer: Float = x[i] * x[i] * x[i]
+            var denom: Float = 6 //3!
+            var sign: Float = -1
+            
+            for j in 1...terms {
+                value += sign * numer / denom
+                numer *= x[i] * x[i]
+                sign *= -1
+                if i == 0 {
+                    denom *= Float((2 * j + 2) * (2 * j + 3))
+                    denomValues.append(denom)
+                } else {
+                    denom = denomValues[j]
+                }
+            }
+            result.append(value)
+        }
+        return result
+    }
+    
+    func startMesureCalculateSinX() {
+        let x = RadianDataSource.genarage()
+        measureTime {
+            sinx(terms: RadianConstants.terms, x: x)         // Took 0.03337204456329346 seconds
+        }
+                                                                //diff 0.0013 => 4%
+        measureTime {
+            sinxOptimized(terms: RadianConstants.terms, x: x)// Took 0.032032012939453125 seconds
+        }
+    }
 }
