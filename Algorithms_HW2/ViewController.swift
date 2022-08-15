@@ -154,10 +154,10 @@ fileprivate extension ViewController {
         }
         
         static func defaultValue() -> WeaponDelivery {
-            return WeaponDelivery(Javelin: 10,
-                                  NLAW: 15,
-                                  Bayraktar: 25 ,
-                                  totalWeight: 40)
+            return WeaponDelivery(Javelin: 25,
+                                  NLAW: 10,
+                                  Bayraktar: 24 ,
+                                  totalWeight: 768)
         }
     }
     
@@ -195,9 +195,9 @@ fileprivate extension ViewController {
     }
     
     func startCalculateNumberVariety() {
-        let ds = DeliveryDataSource.genarate()
-        let defaultDB = DeliveryDataSource.defaultValue()
-        let veriery = calculateWeaponVariety(weaponDelivery: ds)
+//        let ds = DeliveryDataSource.genarate()
+        let defaultDS = DeliveryDataSource.defaultValue()
+        let veriery = calculateWeaponVariety(weaponDelivery: defaultDS)
         print(veriery)
     }
 }
@@ -356,27 +356,30 @@ fileprivate extension ViewController {
         return result
     }
 
+//    1. винесіть кешування за межі циклу for j
+//    2. винесіть ділення за межі циклу for j
+//    3. numer *= x[i] * x[i] можна закешувати
+//    4. sign *= -1 можна швидше і теж за межами циклу по j
+
     
     func sinxOptimized(terms: Int, x: [Float]) -> [Float] {
         let N = RadianConstants.N
         var result: [Float] = []
-        var denomValues: [Float] = [6]
+        
+        var denomValues: [Float] = [-6]
+        for d in 1...terms  {
+            let denom = -1 /  denomValues[d - 1] * Float((2 * d + 2) * (2 * d + 3))
+            denomValues.append(denom)
+        }
+        
         for i in 0..<N {
             var value: Float = x[i]
+            let numerXnumer = x[i] * x[i]
             var numer: Float = x[i] * x[i] * x[i]
-            var denom: Float = 6 //3!
-            var sign: Float = -1
             
             for j in 1...terms {
-                value += sign * numer / denom
-                numer *= x[i] * x[i]
-                sign *= -1
-                if i == 0 {
-                    denom *= Float((2 * j + 2) * (2 * j + 3))
-                    denomValues.append(denom)
-                } else {
-                    denom = denomValues[j]
-                }
+                value +=  numer * denomValues[j]
+                numer *= numerXnumer
             }
             result.append(value)
         }
