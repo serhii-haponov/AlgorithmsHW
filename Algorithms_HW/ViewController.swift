@@ -13,6 +13,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         //MARK: - HW2
+        
         HW2_Task1().startCalculateBigestPrimeter()
 //        HW2_Task2().startCalculateNumberVariety()
 //        HW2_Task3().startMesureImageHandlerFunc()
